@@ -45,12 +45,14 @@ def server_program():
     # Retrieve client public key from PKA
     client_public_key = get_public_key("CLIENT")
     print("Client Public Key:", client_public_key)
+    print("\n")
 
     # Step 1: Receive DES key from client
     encrypted_client_key = eval(conn.recv(1024).decode())  # Convert string back to list
     client_des_key = ''.join(rsa_decrypt(private_key, encrypted_client_key))
-    print("Encrypted DES Key (Client to Server):", encrypted_client_key)
-    print("Decrypted DES Key (Client to Server):", client_des_key)
+    print("Client Encrypted DES Key:", encrypted_client_key)
+    print("Client Decrypted DES Key:", client_des_key)
+    print("\n")
 
     # Step 2: Generate DES key for server and send it to the client
     server_des_key = randomkey()
@@ -59,7 +61,8 @@ def server_program():
     # Encrypt DES key with RSA (character by character)
     encrypted_server_key = rsa_encrypt(client_public_key, server_des_key)
     conn.send(str(encrypted_server_key).encode())
-    print("Encrypted DES Key Sent to Client:", encrypted_server_key)
+    print("Encrypted DES Key (Server):", encrypted_server_key)
+    print("\n")
 
     while True:
         # Step 3: Receive a message from the client
@@ -67,8 +70,8 @@ def server_program():
         if not encrypted_message:
             break
         decrypted_message = decryption(encrypted_message, client_des_key)
-        print("Encrypted Message (Server):", encrypted_message)
-        print("Decrypted Message (Server):", decrypted_message)
+        print("Client Encrypted Message:", encrypted_message)
+        print("Client Decrypted Message:", decrypted_message)
 
         # Step 4: Send a response to the client
         response = input("Server Response: ")
@@ -76,7 +79,7 @@ def server_program():
             break
         encrypted_response = encryption(response, server_des_key)
         conn.send(encrypted_response.encode())
-        print("Encrypted Response Sent to Client:", encrypted_response)
+        print("Encrypted Response:", encrypted_response)
 
     conn.close()
 

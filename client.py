@@ -39,6 +39,7 @@ def client_program():
     # Retrieve server public key from PKA
     server_public_key = get_public_key("SERVER")
     print("Server Public Key:", server_public_key)
+    print("\n")
 
     client_socket = socket.socket()
     client_socket.connect((host, port))
@@ -50,13 +51,15 @@ def client_program():
     # Encrypt DES key with RSA (character by character)
     encrypted_client_key = rsa_encrypt(server_public_key, client_des_key)
     client_socket.send(str(encrypted_client_key).encode())
-    print("Encrypted DES Key Sent to Server:", encrypted_client_key)
+    print("Encrypted DES Key (Client):", encrypted_client_key)
+    print("\n")
 
     # Step 2: Receive DES key from server
     encrypted_server_key = eval(client_socket.recv(1024).decode())  # Convert string back to list
     server_des_key = ''.join(rsa_decrypt(private_key, encrypted_server_key))
-    print("Encrypted DES Key (Server to Client):", encrypted_server_key)
-    print("Decrypted DES Key (Server to Client):", server_des_key)
+    print("Server Encrypted DES Key:", encrypted_server_key)
+    print("Server Decrypted DES Key:", server_des_key)
+    print("\n")
 
     while True:
         # Step 3: Send a message to the server
@@ -65,13 +68,13 @@ def client_program():
             break
         encrypted_message = encryption(message, client_des_key)
         client_socket.send(encrypted_message.encode())
-        print("Encrypted Message Sent to Server:", encrypted_message)
+        print("Encrypted Message:", encrypted_message)
 
         # Step 4: Receive a message from the server
         encrypted_response = client_socket.recv(1024).decode()
         decrypted_response = decryption(encrypted_response, server_des_key)
-        print("Encrypted Response (Client):", encrypted_response)
-        print("Decrypted Response (Client):", decrypted_response)
+        print("Server Encrypted Response:", encrypted_response)
+        print("Server Decrypted Response:", decrypted_response)
 
     client_socket.close()
 
