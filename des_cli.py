@@ -172,10 +172,13 @@ def key_in_binary_conv(key):
     binary_representation_key = ''
     
     for char in key:
-    # Convert the characters to binary and concatenate to form a 64-bit binary string
+        # Convert the characters to binary and concatenate to form a 64-bit binary string
         binary_key = format(ord(char), '08b') 
         binary_representation_key += binary_key
-
+    
+    # Pad to 64 bits if necessary
+    while len(binary_representation_key) < 64:
+        binary_representation_key = '0' + binary_representation_key
     
     return binary_representation_key
 
@@ -382,11 +385,11 @@ def decryption(final_cipher_hex, key):
 
 def pad_input(user_input):
     while len(user_input) % 8 != 0:
-        user_input += ' '
+        user_input += ' '  # Tambahkan spasi
     return user_input
 
 def encryption_large_text(user_input, key):
-    user_input = pad_input(user_input)
+    user_input = pad_input(user_input)  # Pastikan input dipad
     encrypted_text = ""
     for i in range(0, len(user_input), 8):
         block = user_input[i:i+8]
@@ -400,4 +403,4 @@ def decryption_large_text(encrypted_text, key):
         block = encrypted_text[i:i+16]
         decrypted_block = decryption(block, key)
         decrypted_text += decrypted_block
-    return decrypted_text.strip()
+    return decrypted_text.strip()  # Hapus padding

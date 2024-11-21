@@ -13,27 +13,28 @@ def mod_inverse(e, phi):
     return x1 + m0 if x1 < 0 else x1
 
 def generate_rsa_keys():
-    # Choose two prime numbers (for simplicity, smaller primes)
-    p = 61  # Example prime
-    q = 53  # Example prime
+    # Gunakan bilangan prima yang lebih besar
+    p = 7919  # Contoh bilangan prima besar
+    q = 7873
     n = p * q
     phi = (p - 1) * (q - 1)
-    e = 3
-    while gcd(e, phi) != 1:
-        e += 2
+    e = 65537  # Nilai umum untuk eksponen publik
     d = mod_inverse(e, phi)
     return (e, n), (d, n)
 
-def rsa_encrypt(public_key, message):
+# Fungsi untuk enkripsi dengan RSA
+def rsa_encrypt(public_key, plaintext):
     e, n = public_key
-    m = int(message, 16)  # Convert hex string to integer
-    c = pow(m, e, n)      # Encrypt as integer
-    return c
+    ciphertext = [pow(ord(char), e, n) for char in plaintext]
+    return ciphertext
 
+# Fungsi untuk dekripsi dengan RSA
 def rsa_decrypt(private_key, ciphertext):
     d, n = private_key
-    m = pow(ciphertext, d, n)  # Decrypt as integer
-    hex_message = hex(m)[2:].zfill(16)   # Convert back to hexadecimal string
-    return hex_message
+    plaintext = ''.join([chr(pow(char, d, n)) for char in ciphertext])
+    return plaintext
+
+
+
 
 
