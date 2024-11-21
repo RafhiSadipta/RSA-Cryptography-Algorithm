@@ -47,39 +47,40 @@ def server_program():
     print("Client Public Key:", client_public_key)
     print("\n")
 
-    # Step 1: Receive DES key from client
-    encrypted_client_key = eval(conn.recv(1024).decode())  # Convert string back to list
-    client_des_key = ''.join(rsa_decrypt(private_key, encrypted_client_key))
-    print("Client Encrypted DES Key:", encrypted_client_key)
-    print("Client Decrypted DES Key:", client_des_key)
-    print("\n")
-
-    # Step 2: Generate DES key for server and send it to the client
-    server_des_key = randomkey()
-    print("Generated DES Key (Server):", server_des_key)
-
-    # Encrypt DES key with RSA (character by character)
-    encrypted_server_key = rsa_encrypt(client_public_key, server_des_key)
-    conn.send(str(encrypted_server_key).encode())
-    print("Encrypted DES Key (Server):", encrypted_server_key)
-    print("\n")
-
     while True:
-        # Step 3: Receive a message from the client
-        encrypted_message = conn.recv(1024).decode()
-        if not encrypted_message:
+        # Step 1: Receive encrypted DES key and message from client
+        data = conn.recv(1024).decode()
+        if not data:
             break
-        decrypted_message = decryption(encrypted_message, client_des_key)
-        print("Client Encrypted Message:", encrypted_message)
-        print("Client Decrypted Message:", decrypted_message)
+        encrypted_message_key, encrypted_message = data.split('|')
 
-        # Step 4: Send a response to the client
+        # Decrypt the DES key for the current message
+        message_des_key = rsa_decrypt(private_key, eval(encrypted_message_key))
+        print("Decrypted DES Key for Message:", message_des_key)
+
+        # Decrypt the message using the decrypted DES key
+        decrypted_message = decryption(encrypted_message, message_des_key)
+        print("Encrypted Client Message:", encrypted_message)
+        print("Decrypted Client Message:", decrypted_message)
+        print("\n")
+
+        # Step 2: Generate a new DES key for the response
+        response_des_key = randomkey()
+        print("Generated DES Key for Response:", response_des_key)
+
+        # Encrypt the DES key with the client's public key
+        encrypted_response_key = rsa_encrypt(client_public_key, response_des_key)
+
+        # Input the response and encrypt using the new DES key
         response = input("Server Response: ")
         if response.lower().strip() == "bye":
             break
-        encrypted_response = encryption(response, server_des_key)
-        conn.send(encrypted_response.encode())
+        encrypted_response = encryption(response, response_des_key)
+
+        # Send the encrypted DES key and response to the client
+        conn.send(f"{encrypted_response_key}|{encrypted_response}".encode())
         print("Encrypted Response:", encrypted_response)
+        print("\n")
 
     conn.close()
 
