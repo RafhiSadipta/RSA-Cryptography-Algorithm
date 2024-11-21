@@ -1,6 +1,6 @@
 import socket
 from des_cli import encryption_large_text, decryption_large_text, generate_random_key
-from rsa_util_manual import rsa_encrypt
+from rsa import rsa_encrypt
 
 def client_program():
     host = socket.gethostname()
@@ -20,7 +20,9 @@ def client_program():
     while True:
         # Generate DES key and encrypt it using RSA
         des_key = randomkey()
+        print("Generated DES Key:", des_key)
         encrypted_key = rsa_encrypt(public_key, des_key)
+        print("Encrypted DES Key:", encrypted_key)
         client_socket.send(str(encrypted_key).encode())
         print("Encrypted DES Key sent to Server.")
 

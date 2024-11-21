@@ -1,6 +1,6 @@
 import socket
 from des_cli import encryption_large_text, decryption_large_text
-from rsa_util_manual import generate_rsa_keys, rsa_decrypt
+from rsa import generate_rsa_keys, rsa_decrypt
 
 def server_program():
     host = socket.gethostname()
@@ -10,6 +10,7 @@ def server_program():
 
     # Generate RSA keys
     public_key, private_key = generate_rsa_keys()
+    print(public_key, private_key)
 
     server_socket = socket.socket()
     server_socket.bind((host, port))
@@ -24,6 +25,7 @@ def server_program():
     while True:
         # Receive encrypted DES key from client
         encrypted_key = int(conn.recv(1024).decode())
+        print("Encrypted Key Received:", encrypted_key)
         if not encrypted_key:
             break
         des_key = rsa_decrypt(private_key, encrypted_key)

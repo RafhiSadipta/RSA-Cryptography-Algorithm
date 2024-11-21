@@ -26,12 +26,14 @@ def generate_rsa_keys():
 
 def rsa_encrypt(public_key, message):
     e, n = public_key
-    m = int.from_bytes(message.encode(), 'big')  # Convert to integer
-    c = pow(m, e, n)  # c = m^e % n
+    m = int(message, 16)  # Convert hex string to integer
+    c = pow(m, e, n)      # Encrypt as integer
     return c
 
 def rsa_decrypt(private_key, ciphertext):
     d, n = private_key
-    m = pow(ciphertext, d, n)  # m = c^d % n
-    message = m.to_bytes((m.bit_length() + 7) // 8, 'big').decode()
-    return message
+    m = pow(ciphertext, d, n)  # Decrypt as integer
+    hex_message = hex(m)[2:].zfill(16)   # Convert back to hexadecimal string
+    return hex_message
+
+

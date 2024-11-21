@@ -126,7 +126,7 @@ import string
 import random
 
 def generate_random_key():
-    key = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=8))
+    key = ''.join(random.choices('0123456789abcdef', k=16))
     return key
 
 def str_to_bin(user_input):
